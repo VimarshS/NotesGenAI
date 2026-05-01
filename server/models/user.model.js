@@ -23,7 +23,10 @@ const userSchema = new mongoose.Schema({
         type:[mongoose.Schema.Types.ObjectId],
         ref:"Notes",
         default:[]
-
+    },
+    processedPayments:{
+        type:[String],
+        default:[]
     }
 
 },{timestamps:true})

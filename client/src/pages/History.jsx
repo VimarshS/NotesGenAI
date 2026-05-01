@@ -1,268 +1,198 @@
-import axios from 'axios'
 import React, { useEffect, useState } from 'react'
+import axios from 'axios'
 import { serverUrl } from '../App'
-import { AnimatePresence, motion } from "motion/react"
+import { motion, AnimatePresence } from 'motion/react'
 import { useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
-import { GiHamburgerMenu } from "react-icons/gi";
 import FinalResult from '../components/FinalResult'
+import Navbar from '../components/Navbar'
 
-function History() {
+export default function History() {
   const [topics, setTopics] = useState([])
-   const navigate = useNavigate()
-  const { userData } = useSelector((state) => state.user)
-  const credits = userData.credits
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-const [activeNoteId, setActiveNoteId] = useState(null);
+  const [activeId, setActiveId] = useState(null)
+  const [selectedNote, setSelectedNote] = useState(null)
+  const [loadingNote, setLoadingNote] = useState(false)
+  const [sidebarOpen, setSidebarOpen] = useState(true)
+  const navigate = useNavigate()
+  const { userData } = useSelector(s => s.user)
 
-  const [selectedNote, setSelectedNote] = useState(null);
-  const [loading, setLoading] = useState(false);
   useEffect(() => {
-    const myNotes = async () => {
-      try {
-        const res = await axios.get(serverUrl + "/api/notes/getnotes", { withCredentials: true })
-        console.log(res.data)
-        setTopics(Array.isArray(res.data) ? res.data : [])
-
-      } catch (error) {
-        console.log(error)
-      }
-    }
-    myNotes()
+    axios.get(serverUrl + '/api/notes/getnotes', { withCredentials:true })
+      .then(res => setTopics(Array.isArray(res.data) ? res.data : []))
+      .catch(console.log)
   }, [])
 
-  const openNotes = async (noteId) => {
-    setLoading(true)
-    setActiveNoteId(noteId)
-try {
-  const res = await axios.get(serverUrl + `/api/notes/${noteId}`,{withCredentials:true})
-
-  setSelectedNote(res.data.content)
-setLoading(false)
-} catch (error) {
-  console.log(error)
-  setLoading(false)
-}
-
-    
-  }
-
-
-
-
-
   useEffect(() => {
-  if (window.innerWidth >= 1024) {
-    setIsSidebarOpen(true)
+    setSidebarOpen(window.innerWidth >= 1024)
+  }, [])
+
+  const openNote = async (id) => {
+    if (activeId === id) return
+    setLoadingNote(true)
+    setActiveId(id)
+    try {
+      const res = await axios.get(serverUrl + `/api/notes/${id}`, { withCredentials:true })
+      setSelectedNote(res.data.content)
+      if (window.innerWidth < 1024) setSidebarOpen(false)
+    } catch(e) { console.log(e) }
+    setLoadingNote(false)
   }
-}, [])
-
-
 
   return (
-    <div className='min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 px-6 py-8 relative '>
+    <div className='noise' style={{ minHeight:'100vh', background:'var(--bg)', fontFamily:'var(--font)', display:'flex', flexDirection:'column' }}>
+      <div className='grid-bg' style={{ position:'fixed', inset:0, opacity:0.3, pointerEvents:'none' }} />
 
-      <motion.header
-        initial={{ opacity: 0, y: -15 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="
-      mb-10
-      rounded-2xl
-      bg-black/80 backdrop-blur-xl
-      border border-white/10
-      px-8 py-6 items-start
-      flex justify-between md:items-center gap-4 flex-wrap 
-      shadow-[0_20px_45px_rgba(0,0,0,0.6)]
-    ">
-      <div onClick={() => navigate("/")} className='cursor-pointer'><h1 className='text-2xl font-bold
-                  bg-linear-to-r from-white via-gray-300 to-white
-                  bg-clip-text text-transparent'>ExamNotes AI</h1>
-                <p className='text-sm text-gray-300 mt-1'>AI-powered exam-oriented notes & revision</p></div>
-      
-              <div className='flex items-center gap-4 '>
+      <Navbar />
 
-                {!isSidebarOpen && <button onClick={()=>setIsSidebarOpen(true)} className='lg:hidden text-white text-2xl'><GiHamburgerMenu/></button>}
-                <button className='flex items-center gap-2 
-          px-4 py-2 rounded-full
-          bg-white/10
-          border border-white/20
-          text-white text-sm' onClick={() => navigate("/pricing")}>
-                  <span className='text-xl'>💠</span>
-                  <span>{credits}</span>
-                  <motion.span whileHover={{ scale: 1.2 }}
-                    whileTap={{ scale: 0.97 }}
-                    className='ml-2 h-5 w-5 flex items-center justify-center
-                              rounded-full bg-white  text-xs font-bold'
-                  >
-                    ➕
-      
-                  </motion.span>
-      
-      
-                </button>
-                
-                
-              </div>
+      <div style={{ position:'relative', zIndex:1, flex:1, maxWidth:1200, margin:'0 auto', width:'100%', padding:'88px 20px 40px', display:'flex', flexDirection:'column' }}>
 
-
-      </motion.header>
-
-
-      <div className='grid grid-cols-1 lg:grid-cols-4 gap-6'>
-        <AnimatePresence>
-
-          {isSidebarOpen && 
-          <motion.div
-          initial={{ x: -320 }}
-          animate={{ x: 0 }}
-          exit={{ x: -320 }}
-          transition={{ type: "spring", stiffness: 260, damping: 30 }}
-           className='fixed lg:static
-            top-0 left-0 z-50 lg:z-auto
-            w-72 lg:w-auto
-            h-full lg:h-[75vh]
-            lg:rounded-3xl
-            lg:col-span-1
-            bg-black/90 lg:bg-black/80
-            backdrop-blur-xl 
-            border border-white/10
-            shadow-[0_20px_45px_rgba(0,0,0,0.6)]
-            p-5
-            
-            overflow-y-auto'>
-              <button onClick={()=>setIsSidebarOpen(false)} className='lg:hidden text-white mb-4'>
-               ⬅️ back
-              </button>
-
-              <div className='mb-4 space-y-1'>
-                <button onClick={()=>navigate("/notes")} className='w-full px-3 py-2 rounded-lg text-sm text-gray-200 bg-white/10  text-start hover:bg-white/20'>
-                ➕ New Notes
-                </button>
-
-                <hr className="border-white/10 mb-4" />
-
-
-                <h2 className='mb-4 text-lg font-bold bg-gradient-to-r from-white via-gray-300 to-white bg-clip-text text-transparent'>
-                  📚 Your Notes
-                </h2>
-
-                {topics.length === 0 && (
-            <p className="text-sm text-gray-400">No notes created yet</p>
-          )}
-
-          <ul className='space-y-3'>
-
-            {topics.map((t,i)=>(
-              <li key={i} onClick={()=>openNotes(t._id)} className={`
-    cursor-pointer rounded-xl p-3 border transition-all
-    ${
-      activeNoteId === t._id
-        ? "bg-indigo-500/30 border-indigo-400 shadow-[0_0_0_1px_rgba(99,102,241,0.6)]"
-        : "bg-white/5 border-white/10 hover:bg-white/10"
-    }
-  `}>
-
-              <p className='text-sm font-semibold text-white '>{t.topic}</p>
-
-              <div className='flex flex-wrap gap-2 mt-2 text-xs'>
-
-                {t.classLevel && <span className='px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300'>ClassLevel : {t.classLevel}</span>}
-
-                {t.examType&& <span className='px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300'> {t.examType}</span>}
-
-              </div>
-
-              <div className='flex gap-3 mt-2 text-xs text-gray-300'>
-
-                {t.revisionMode && <span>⚡ Revision</span>} 
-                {t.includeDiagram && <span>📊 Diagram</span>} 
-                {t.includeChart && <span>📈 Chart</span>}
-              </div>
-
-
-              </li>
-
-              
-
-
-            ))}
-
-
-            
-          </ul>
-              </div>
-            
-            
-            </motion.div>}
-        </AnimatePresence>
-
-
-        {/* <motion.div 
-
-        initial={{ opacity: 0, y: -15 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }} 
-        className='lg:col-span-3
-        rounded-2xl
-        bg-white
-        shadow-[0_15px_40px_rgba(0,0,0,0.15)]
-        p-6
-        min-h-[75vh]'
-
-        >
-           {loading && <p className="text-center text-gray-500">Loading notes…</p>}
-      {!loading && !selectedNote && (
-        <div className="h-full flex items-center justify-center text-gray-400">
-          Select a topic from the Sidebar
+        {/* Page header */}
+        <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:20, flexWrap:'wrap', gap:10 }}>
+          <div>
+            <h1 style={{ fontSize:26, fontWeight:800, letterSpacing:'-0.04em', color:'var(--text)', margin:'0 0 4px' }}>Note History</h1>
+            <p style={{ fontSize:13, color:'var(--text-3)', margin:0 }}>{topics.length} saved {topics.length === 1 ? 'note' : 'notes'}</p>
+          </div>
+          <div style={{ display:'flex', gap:8 }}>
+            <button
+              onClick={() => setSidebarOpen(v => !v)}
+              className='btn btn-secondary btn-sm'
+              style={{ display: window.innerWidth < 1024 ? 'flex' : 'none' }}
+            >
+              ☰ Topics
+            </button>
+            <button onClick={() => navigate('/notes')} className='btn btn-primary btn-sm'>
+              ✦ New Notes
+            </button>
+          </div>
         </div>
-      )}
 
-      {!loading && selectedNote &&  <FinalResult result={selectedNote}/>}
+        {/* Body */}
+        <div style={{ flex:1, display:'grid', gridTemplateColumns:'280px 1fr', gap:16, alignItems:'start' }} className='history-grid'>
 
+          {/* Sidebar */}
+          <>
+            {/* Mobile overlay */}
+            <AnimatePresence>
+              {sidebarOpen && (
+                <motion.div
+                  initial={{ opacity:0 }} animate={{ opacity:1 }} exit={{ opacity:0 }}
+                  onClick={() => setSidebarOpen(false)}
+                  style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.6)', backdropFilter:'blur(4px)', zIndex:40, display:'none' }}
+                  className='mobile-overlay'
+                />
+              )}
+            </AnimatePresence>
 
+            <motion.div
+              animate={{ x: sidebarOpen ? 0 : -320 }}
+              transition={{ type:'spring', stiffness:280, damping:28 }}
+              style={{
+                background:'var(--bg2)', border:'1px solid var(--border)',
+                borderRadius:18, overflow:'hidden',
+                position:'sticky', top:80,
+                maxHeight:'calc(100vh - 110px)',
+                display:'flex', flexDirection:'column',
+              }}
+              className='history-sidebar'
+            >
+              {/* Sidebar header */}
+              <div style={{ padding:'14px 16px', borderBottom:'1px solid var(--border)', background:'var(--bg3)', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+                <span style={{ fontSize:13, fontWeight:700, color:'var(--text)' }}>Your Notes</span>
+                <button onClick={() => navigate('/notes')} className='btn btn-primary' style={{ padding:'5px 12px', fontSize:11, borderRadius:7 }}>
+                  + New
+                </button>
+              </div>
 
-        </motion.div> */}
-        <motion.div 
-  initial={{ opacity: 0, y: -15 }}
-  animate={{ opacity: 1, y: 0 }}
-  transition={{ duration: 0.6 }} 
-  className='lg:col-span-3
-  rounded-2xl
-  bg-white
-  shadow-[0_15px_40px_rgba(0,0,0,0.15)]
-  p-6
-  min-h-[75vh]
-  relative overflow-hidden'
->
-  {/* Subtle grid texture */}
-  {/* <div className="absolute inset-0 pointer-events-none z-0 opacity-[0.025]"
-    style={{
-      backgroundImage: `linear-gradient(#111 1px, transparent 1px), linear-gradient(90deg, #111 1px, transparent 1px)`,
-      backgroundSize: "72px 72px"
-    }}
-  /> */}
-  <div className="fixed inset-0 pointer-events-none z-0 opacity-[0.025]"
-    style={{
-      backgroundImage: `linear-gradient(#111 1px, transparent 1px), linear-gradient(90deg, #111 1px, transparent 1px)`,
-      backgroundSize: "72px 72px"
-    }}
-  />
+              {/* List */}
+              <div style={{ flex:1, overflowY:'auto', padding:10 }}>
+                {topics.length === 0 ? (
+                  <div style={{ textAlign:'center', padding:'40px 16px' }}>
+                    <div style={{ fontSize:28, marginBottom:10 }}>📭</div>
+                    <p style={{ fontSize:13, color:'var(--text-3)', margin:'0 0 12px' }}>No notes yet</p>
+                    <button onClick={() => navigate('/notes')} className='btn btn-primary btn-sm'>Create First Note</button>
+                  </div>
+                ) : (
+                  <div style={{ display:'flex', flexDirection:'column', gap:4 }}>
+                    {topics.map((t) => {
+                      const isActive = activeId === t._id
+                      return (
+                        <motion.button
+                          key={t._id}
+                          onClick={() => openNote(t._id)}
+                          whileHover={{ x:2 }}
+                          style={{
+                            width:'100%', textAlign:'left', border:'none', cursor:'pointer',
+                            borderRadius:10, padding:'11px 13px', fontFamily:'var(--font)',
+                            transition:'all 0.15s',
+                            background: isActive ? 'var(--accent-dim)' : 'transparent',
+                            outline: isActive ? '1px solid rgba(99,102,241,0.3)' : '1px solid transparent',
+                          }}
+                          onMouseEnter={e => { if (!isActive) e.currentTarget.style.background='var(--bg3)' }}
+                          onMouseLeave={e => { if (!isActive) e.currentTarget.style.background='transparent' }}
+                        >
+                          <p style={{ fontSize:13, fontWeight:600, color: isActive ? 'var(--accent-2)' : 'var(--text)', margin:'0 0 6px', lineHeight:1.3, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
+                            {t.topic}
+                          </p>
+                          <div style={{ display:'flex', flexWrap:'wrap', gap:4 }}>
+                            {t.classLevel && <span className='badge badge-accent' style={{ fontSize:10, padding:'2px 7px' }}>{t.classLevel}</span>}
+                            {t.examType && <span className='badge badge-violet' style={{ fontSize:10, padding:'2px 7px' }}>{t.examType}</span>}
+                            {t.revisionMode && <span className='badge badge-amber' style={{ fontSize:10, padding:'2px 7px' }}>⚡ Rev</span>}
+                          </div>
+                        </motion.button>
+                      )
+                    })}
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          </>
 
-  <div className="relative z-10">
-    {loading && <p className="text-center text-gray-500">Loading notes…</p>}
-    {!loading && !selectedNote && (
-      <div className="h-full flex items-center justify-center text-gray-400">
-        Select a topic from the Sidebar
+          {/* Main content */}
+          <div style={{ background:'var(--bg2)', border:'1px solid var(--border)', borderRadius:18, minHeight:'calc(100vh - 140px)', overflow:'hidden' }}>
+
+            {/* Loading */}
+            {loadingNote && (
+              <div style={{ height:'100%', minHeight:400, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', gap:14 }}>
+                <motion.div animate={{ rotate:360 }} transition={{ repeat:Infinity, duration:1.2, ease:'linear' }}
+                  style={{ width:36, height:36, borderRadius:'50%', border:'3px solid var(--bg5)', borderTopColor:'var(--accent)' }} />
+                <p style={{ fontSize:13, color:'var(--text-3)' }}>Loading note…</p>
+              </div>
+            )}
+
+            {/* Empty */}
+            {!loadingNote && !selectedNote && (
+              <div style={{ height:'100%', minHeight:400, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', gap:14 }}>
+                <div style={{ width:52, height:52, borderRadius:16, background:'var(--accent-dim)', border:'1px solid rgba(99,102,241,0.25)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:22, color:'var(--accent)' }}>
+                  📖
+                </div>
+                <div style={{ textAlign:'center' }}>
+                  <p style={{ fontSize:14, fontWeight:600, color:'var(--text-3)', margin:'0 0 4px' }}>Select a note to view</p>
+                  <p style={{ fontSize:12, color:'var(--text-4)', margin:0 }}>
+                    {topics.length > 0 ? `${topics.length} note${topics.length > 1 ? 's' : ''} available on the left` : 'Create your first note to get started'}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Note content */}
+            {!loadingNote && selectedNote && (
+              <AnimatePresence>
+                <motion.div initial={{ opacity:0 }} animate={{ opacity:1 }} style={{ padding:28 }}>
+                  <FinalResult result={selectedNote} />
+                </motion.div>
+              </AnimatePresence>
+            )}
+          </div>
+        </div>
       </div>
-    )}
-    {!loading && selectedNote && <FinalResult result={selectedNote} />}
-  </div>
-</motion.div>
-      </div>
 
+      <style>{`
+        @media (max-width: 1024px) {
+          .history-grid { grid-template-columns: 1fr !important; }
+          .history-sidebar { position: fixed !important; top: 0 !important; left: 0 !important; height: 100vh !important; width: 290px !important; z-index: 45 !important; border-radius: 0 18px 18px 0 !important; }
+          .mobile-overlay { display: block !important; }
+        }
+      `}</style>
     </div>
   )
 }
-
-export default History

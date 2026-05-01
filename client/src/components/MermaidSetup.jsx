@@ -1,86 +1,52 @@
-
 import React, { useEffect, useRef } from 'react'
 import mermaid from 'mermaid'
 
-mermaid.initialize({
-    startOnLoad:false,
-    theme:"default"
-})
+mermaid.initialize({ startOnLoad:false, theme:'dark', themeVariables: {
+  primaryColor: '#6366f1', primaryTextColor: '#f0ede8', primaryBorderColor: '#4f46e5',
+  lineColor: '#6366f1', secondaryColor: '#1c1f28', tertiaryColor: '#22262f',
+  background: '#111318', mainBkg: '#1c1f28', nodeBorder: '#6366f1',
+  clusterBkg: '#16181f', titleColor: '#f0ede8', edgeLabelBackground: '#1c1f28',
+}})
 
-const cleanMermaidChart = (diagram) => {
-  if (!diagram) return "";
+const clean = (diagram) => {
+  if (!diagram) return ''
+  let d = diagram.replace(/\r\n/g, '\n').trim()
+  if (!d.startsWith('graph') && !d.startsWith('flowchart') && !d.startsWith('sequenceDiagram')) d = `graph TD\n${d}`
+  return d
+}
 
-  let clean = diagram
-    .replace(/\r\n/g, "\n")
-    .trim();
+const fixNodes = (d) => {
+  let idx = 0
+  const used = new Map()
+  return d.replace(/\[(.*?)\]/g, (match, label) => {
+    const key = label.trim()
+    if (used.has(key)) return used.get(key)
+    idx++
+    const node = `N${idx}["${key}"]`
+    used.set(key, node)
+    return node
+  })
+}
 
-  if (!clean.startsWith("graph")) {
-    clean = `graph TD\n${clean}`;
-  }
+export default function MermaidSetup({ diagram }) {
+  const ref = useRef(null)
 
-  return clean;
-};
-
-const autoFixNodes = (diagram) => {
-  let index = 0;
-  const used = new Map();
-
-  return diagram.replace(/\[(.*?)\]/g, (match, label) => {
-    // normalize label for key
-    const key = label.trim();
-
-    // reuse same node if label already seen
-    if (used.has(key)) {
-      return used.get(key);
-    }
-
-    index++;
-    const id = `N${index}`;
-    const node = `${id}["${key}"]`;
-
-    used.set(key, node);
-    return node;
-  });
-};
-
-
-
-function MermaidSetup({diagram}) {
-const containerRef = useRef(null)
-
-useEffect(() => {
-    if (!diagram || !containerRef.current) return;
-
-    const renderDiagram = async () => {
+  useEffect(() => {
+    if (!diagram || !ref.current) return
+    const render = async () => {
       try {
-        containerRef.current.innerHTML = "";
-
-        const uniqueId = `mermaid-${Math.random()
-          .toString(36)
-          .substring(2, 9)}`;
-
-        // ✅ sanitize before render
-        const safeChart = autoFixNodes(cleanMermaidChart(diagram));
-
-        const { svg } = await mermaid.render(uniqueId, safeChart);
-
-        containerRef.current.innerHTML = svg;
-      } catch (error) {
-        console.error("Mermaid render failed:", error);
-      }
-    };
-
-    renderDiagram();
-  }, [diagram]);
-
-
-
+        ref.current.innerHTML = ''
+        const id = `mermaid-${Math.random().toString(36).slice(2,9)}`
+        const { svg } = await mermaid.render(id, fixNodes(clean(diagram)))
+        ref.current.innerHTML = svg
+      } catch(e) { console.error('Mermaid error:', e) }
+    }
+    render()
+  }, [diagram])
 
   return (
-    <div className='bg-white border rounded-lg p-4 overflow-x-auto'>
-      <div ref={containerRef}/>
+    <div style={{ padding:24, background:'var(--bg3)', overflowX:'auto', fontFamily:'var(--font)' }}>
+      <div ref={ref} style={{ display:'flex', justifyContent:'center' }} />
     </div>
   )
 }
-
-export default MermaidSetup

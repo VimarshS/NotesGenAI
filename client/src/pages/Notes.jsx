@@ -1,338 +1,139 @@
-// import React, { useState } from 'react'
-// import { motion } from "motion/react"
-// import { useNavigate } from 'react-router-dom'
-// import { useSelector } from 'react-redux'
-// import TopicForm from '../components/TopicForm'
-// import Sidebar from '../components/Sidebar'
-// import FinalResult from '../components/FinalResult'
-// function Notes() {
-//   const navigate = useNavigate()
-//   const { userData } = useSelector((state) => state.user)
-//   const credits = userData.credits
-//   const [loading,setLoading]= useState(false)
-//   const [result , setResult] = useState(null)
-//   const [error,setError] = useState("")
-
-//   return (
-//     <div className='min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 px-6 py-8'>
-//       <motion.header
-//         initial={{ opacity: 0, y: -15 }}
-//         animate={{ opacity: 1, y: 0 }}
-//         transition={{ duration: 0.5 }}
-
-//         className=" mb-10
-//             rounded-2xl
-//             bg-black/80 backdrop-blur-xl
-//             border border-white/10
-//             px-8 py-6
-//             shadow-[0_20px_45px_rgba(0,0,0,0.6)] items-start
-//             flex md:items-center justify-between gap-4 flex-col md:flex-row"
-//       >
-//         <div onClick={() => navigate("/")} className='cursor-pointer'><h1 className='text-2xl font-bold
-//             bg-linear-to-r from-white via-gray-300 to-white
-//             bg-clip-text text-transparent'>ExamNotes AI</h1>
-//           <p className='text-sm text-gray-300 mt-1'>AI-powered exam-oriented notes & revision</p></div>
-
-//         <div className='flex items-center gap-4 flex-wrap'>
-//           <button className='flex items-center gap-2 
-//     px-4 py-2 rounded-full
-//     bg-white/10
-//     border border-white/20
-//     text-white text-sm' onClick={() => navigate("/pricing")}>
-//             <span className='text-xl'>💠</span>
-//             <span>{credits}</span>
-//             <motion.span whileHover={{ scale: 1.2 }}
-//               whileTap={{ scale: 0.97 }}
-//               className='ml-2 h-5 w-5 flex items-center justify-center
-//                         rounded-full bg-white  text-xs font-bold'
-//             >
-//               ➕
-
-//             </motion.span>
-
-
-//           </button>
-//           <button onClick={()=>navigate("/history")} className='px-4 py-3 rounded-full
-//       text-sm font-medium
-//       bg-white/10
-//       border border-white/20
-//       text-white
-//       hover:bg-white/20
-//       transition
-//       flex items-center gap-2'>
-//         📚 Your Notes
-
-
-//           </button>
-//         </div>
-
-
-//       </motion.header>
-
-
-//       <motion.div 
-//           className="mb-12">
-//         <TopicForm loading={loading} setResult={setResult} setLoading={setLoading} setError={setError}/>
-//       </motion.div>
-
-
-//       {loading && (
-//           <motion.div
-//             animate={{ opacity: [0.4, 1, 0.4] }}
-//             transition={{ repeat: Infinity, duration: 1.2 }}
-//             className="text-center text-black font-medium mb-6"
-//           >
-//             Generating exam-focused notes…
-//           </motion.div>
-//         )}
-
-//         {error && (
-//           <div className="mb-6 text-center text-red-600 font-medium">
-//             {error}
-//           </div>
-//         )}
-
-//     {!result && <motion.div whileHover={{ scale: 1.02 }}
-//             className="
-//               h-64
-//               rounded-2xl
-//               flex flex-col items-center justify-center
-//               bg-white/60 backdrop-blur-lg
-//               border border-dashed border-gray-300
-//               text-gray-500
-//               shadow-inner
-//             ">
-//                <span className="text-4xl mb-3">📘</span>
-//             <p className="text-sm">
-//               Generated notes will appear here
-//             </p>
-
-//      </motion.div>}
-
-
-//     {result && <motion.div
-//     initial={{ opacity: 0, y: 30 }}
-//     animate={{ opacity: 1, y: 0 }}
-//     transition={{ duration: 0.4 }}
-//      className='flex flex-col
-//       lg:grid lg:grid-cols-4
-//       gap-6'>
-
-//         <div className='lg:col-span-1'>
-//           <Sidebar result={result}/>
-
-
-//         </div>
-
-//         <div className='lg:col-span-3
-//         rounded-2xl
-//         bg-white
-//         shadow-[0_15px_40px_rgba(0,0,0,0.15)]
-//         p-6'>
-//           <FinalResult result={result}/>
-
-//         </div>
-
-
-//     </motion.div>
-// }
-//     </div>
-//   )
-// }
-
-// export default Notes
 import React, { useState } from 'react'
-import { motion } from "motion/react"
+import { motion, AnimatePresence } from 'motion/react'
 import { useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import TopicForm from '../components/TopicForm'
 import Sidebar from '../components/Sidebar'
 import FinalResult from '../components/FinalResult'
+import Navbar from '../components/Navbar'
 
-function Notes() {
-  const navigate = useNavigate()
-  const { userData } = useSelector((state) => state.user)
-  const credits = userData.credits
+export default function Notes() {
+  const { userData } = useSelector(s => s.user)
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState(null)
-  const [error, setError] = useState("")
+  const [error, setError] = useState('')
 
   return (
-    <div className='min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 px-4 sm:px-6 py-6 sm:py-8 relative'
-      style={{ fontFamily: "'Cabinet Grotesk', sans-serif" }}>
+    <div className='noise' style={{ minHeight:'100vh', background:'var(--bg)', fontFamily:'var(--font)' }}>
+      <div className='grid-bg' style={{ position:'fixed', inset:0, opacity:0.3, pointerEvents:'none' }} />
 
-      {/* Grid texture */}
-      <div className="fixed inset-0 pointer-events-none z-0 opacity-[0.025]"
-        style={{
-          backgroundImage: `linear-gradient(#111 1px, transparent 1px), linear-gradient(90deg, #111 1px, transparent 1px)`,
-          backgroundSize: "72px 72px"
-        }}
-      />
+      <Navbar />
 
-      {/* ── Header ── */}
-      <motion.header
-        initial={{ opacity: 0, y: -15 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="relative z-10 mb-8 sm:mb-10
-          rounded-2xl
-          bg-black/80 backdrop-blur-xl
-          border border-white/10
-          px-5 sm:px-8 py-4 sm:py-6
-          shadow-[0_20px_45px_rgba(0,0,0,0.6)]
-          flex md:items-center justify-between gap-4 flex-col md:flex-row overflow-hidden"
-      >
-        {/* Header grid texture */}
-        <div className="absolute inset-0 pointer-events-none opacity-[0.04]"
-          style={{
-            backgroundImage: `linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px)`,
-            backgroundSize: "72px 72px"
-          }}
-        />
+      <div style={{ position:'relative', zIndex:1, maxWidth:1200, margin:'0 auto', padding:'88px 20px 40px' }}>
 
-        {/* Logo */}
-        <div onClick={() => navigate("/")} className='relative z-10 cursor-pointer'>
-          <h1 className='text-lg sm:text-2xl font-black tracking-[-0.02em]
-            bg-gradient-to-r from-white via-gray-300 to-white
-            bg-clip-text text-transparent'
-            style={{ fontFamily: "'Cabinet Grotesk', sans-serif" }}>
-            ExamNotes AI
-          </h1>
-          <p className='text-xs sm:text-sm font-medium text-gray-300 mt-0.5 sm:mt-1'>
-            AI-powered exam-oriented notes & revision
-          </p>
-        </div>
-
-        {/* Controls */}
-        <div className='relative z-10 flex items-center gap-2 sm:gap-4 flex-wrap'>
-          {/* Credits */}
-          <motion.button
-            whileHover={{ scale: 1.04, backgroundColor: "rgba(255,255,255,0.15)" }}
-            whileTap={{ scale: 0.97 }}
-            onClick={() => navigate("/pricing")}
-            className='flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl
-              text-white text-xs sm:text-sm font-bold transition-colors duration-200'
-            style={{
-              background: "rgba(255,255,255,0.08)",
-              border: "1px solid rgba(255,255,255,0.15)",
-              fontFamily: "'Cabinet Grotesk', sans-serif"
-            }}
-          >
-            <span className='text-base sm:text-xl'>💠</span>
-            <span>{credits}</span>
-            <div className='w-px h-3 bg-white/20' />
-            <motion.span
-              whileHover={{ rotate: 90 }}
-              transition={{ duration: 0.2 }}
-              className='h-4 w-4 sm:h-5 sm:w-5 flex items-center justify-center
-                rounded-full bg-white text-xs font-black text-black'
-            >
-              +
-            </motion.span>
-          </motion.button>
-
-          {/* History */}
-          <motion.button
-            whileHover={{ scale: 1.04, backgroundColor: "rgba(255,255,255,0.15)" }}
-            whileTap={{ scale: 0.97 }}
-            onClick={() => navigate("/history")}
-            className='flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl
-              text-white text-xs sm:text-sm font-bold transition-colors duration-200'
-            style={{
-              background: "rgba(255,255,255,0.08)",
-              border: "1px solid rgba(255,255,255,0.15)",
-              fontFamily: "'Cabinet Grotesk', sans-serif"
-            }}
-          >
-            📚 <span>Your Notes</span>
-          </motion.button>
-        </div>
-      </motion.header>
-
-      {/* ── Topic Form ── */}
-      <motion.div className="relative z-10 mb-8 sm:mb-12">
-        <TopicForm loading={loading} setResult={setResult} setLoading={setLoading} setError={setError} />
-      </motion.div>
-
-      {/* ── Loading ── */}
-      {loading && (
+        {/* Page header */}
         <motion.div
-          animate={{ opacity: [0.4, 1, 0.4] }}
-          transition={{ repeat: Infinity, duration: 1.2 }}
-          className="relative z-10 text-center font-bold mb-6 text-sm tracking-[0.15em] uppercase text-black/50"
-          style={{ fontFamily: "'JetBrains Mono', monospace" }}
+          initial={{ opacity:0, y:16 }} animate={{ opacity:1, y:0 }}
+          transition={{ duration:0.45 }}
+          style={{ marginBottom:28 }}
         >
-          Generating exam-focused notes…
-        </motion.div>
-      )}
-
-      {/* ── Error ── */}
-      {error && (
-        <div className="relative z-10 mb-6 text-center text-red-600 font-bold text-sm"
-          style={{ fontFamily: "'Cabinet Grotesk', sans-serif" }}>
-          {error}
-        </div>
-      )}
-
-      {/* ── Empty state ── */}
-      {!result && (
-        <motion.div
-          whileHover={{ scale: 1.01 }}
-          className="relative z-10 h-64 rounded-2xl
-            flex flex-col items-center justify-center gap-3
-            bg-white/60 backdrop-blur-lg
-            border border-dashed border-gray-300
-            shadow-inner overflow-hidden"
-        >
-          {/* Grid inside empty state */}
-          <div className="absolute inset-0 pointer-events-none opacity-[0.025]"
-            style={{
-              backgroundImage: `linear-gradient(#111 1px, transparent 1px), linear-gradient(90deg, #111 1px, transparent 1px)`,
-              backgroundSize: "72px 72px"
-            }}
-          />
-          <span className="relative z-10 text-4xl">📘</span>
-          <p className="relative z-10 text-sm font-bold text-gray-400 tracking-[0.1em] uppercase"
-            style={{ fontFamily: "'JetBrains Mono', monospace" }}>
-            Generated notes will appear here
-          </p>
-        </motion.div>
-      )}
-
-      {/* ── Result ── */}
-      {result && (
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
-          className='relative z-10 flex flex-col lg:grid lg:grid-cols-4 gap-5 sm:gap-6'
-        >
-          <div className='lg:col-span-1'>
-            <Sidebar result={result} />
-          </div>
-
-          <div className='relative lg:col-span-3 rounded-2xl bg-white
-            shadow-[0_15px_40px_rgba(0,0,0,0.15)] p-4 sm:p-6 overflow-hidden'>
-            {/* Grid inside result panel */}
-            <div className="absolute inset-0 pointer-events-none z-0 opacity-[0.025]"
-              style={{
-                backgroundImage: `linear-gradient(#111 1px, transparent 1px), linear-gradient(90deg, #111 1px, transparent 1px)`,
-                backgroundSize: "72px 72px"
-              }}
-            />
-            <div className="relative z-10">
-              <FinalResult result={result} />
+          <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', flexWrap:'wrap', gap:12 }}>
+            <div>
+              <h1 style={{ fontSize:26, fontWeight:800, letterSpacing:'-0.04em', color:'var(--text)', margin:'0 0 4px' }}>
+                Generate Notes
+              </h1>
+              <p style={{ fontSize:13, color:'var(--text-3)', margin:0 }}>
+                AI-powered notes for any topic or subject
+              </p>
+            </div>
+            <div style={{ display:'flex', alignItems:'center', gap:8 }}>
+              <span className='badge badge-accent'>
+                <span style={{ fontSize:9 }}>◆</span>
+                {userData?.credits ?? 0} credits
+              </span>
             </div>
           </div>
         </motion.div>
-      )}
+
+        {/* Error banner */}
+        <AnimatePresence>
+          {error && (
+            <motion.div
+              initial={{ opacity:0, y:-8, height:0 }} animate={{ opacity:1, y:0, height:'auto' }} exit={{ opacity:0, y:-8, height:0 }}
+              style={{
+                background:'var(--rose-dim)', border:'1px solid rgba(251,113,133,0.25)',
+                borderRadius:10, padding:'12px 16px', marginBottom:16,
+                display:'flex', alignItems:'center', gap:10, overflow:'hidden',
+              }}
+            >
+              <span style={{ fontSize:14 }}>⚠</span>
+              <span style={{ fontSize:13, color:'var(--rose)', fontWeight:500 }}>{error}</span>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Two-column layout */}
+        <div style={{ display:'grid', gridTemplateColumns:'380px 1fr', gap:20, alignItems:'start' }} className='notes-grid'>
+
+          {/* Left: Form */}
+          <motion.div initial={{ opacity:0, x:-20 }} animate={{ opacity:1, x:0 }} transition={{ duration:0.45, delay:0.05 }}
+            style={{ position:'sticky', top:80 }}>
+            <TopicForm loading={loading} setResult={setResult} setLoading={setLoading} setError={setError} />
+          </motion.div>
+
+          {/* Right: Result */}
+          <motion.div initial={{ opacity:0, x:20 }} animate={{ opacity:1, x:0 }} transition={{ duration:0.45, delay:0.1 }}>
+
+            {/* Empty state */}
+            {!result && !loading && (
+              <div style={{
+                background:'var(--bg2)', border:'1px dashed var(--border2)',
+                borderRadius:20, minHeight:480,
+                display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', gap:14,
+              }}>
+                <div style={{ width:56, height:56, borderRadius:16, background:'var(--accent-dim)', border:'1px solid rgba(99,102,241,0.25)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:24, color:'var(--accent)' }}>
+                  ✦
+                </div>
+                <div style={{ textAlign:'center' }}>
+                  <p style={{ fontSize:14, fontWeight:600, color:'var(--text-3)', margin:'0 0 4px' }}>Notes will appear here</p>
+                  <p style={{ fontSize:12, color:'var(--text-4)', margin:0 }}>Fill in the form and click Generate</p>
+                </div>
+              </div>
+            )}
+
+            {/* Loading state */}
+            {loading && (
+              <div style={{
+                background:'var(--bg2)', border:'1px solid var(--border)',
+                borderRadius:20, minHeight:480,
+                display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', gap:16,
+              }}>
+                <motion.div
+                  animate={{ rotate:360 }} transition={{ repeat:Infinity, duration:1.5, ease:'linear' }}
+                  style={{ width:40, height:40, borderRadius:'50%', border:'3px solid var(--bg5)', borderTopColor:'var(--accent)' }}
+                />
+                <div style={{ textAlign:'center' }}>
+                  <p style={{ fontSize:14, fontWeight:600, color:'var(--text-2)', margin:'0 0 4px' }}>Generating your notes…</p>
+                  <p style={{ fontSize:12, color:'var(--text-4)', margin:0 }}>AI is crafting structured content for you</p>
+                </div>
+              </div>
+            )}
+
+            {/* Result */}
+            {result && !loading && (
+              <AnimatePresence>
+                <motion.div
+                  initial={{ opacity:0, y:20 }} animate={{ opacity:1, y:0 }} transition={{ duration:0.5 }}
+                  style={{ display:'grid', gridTemplateColumns:'1fr 260px', gap:16, alignItems:'start' }}
+                  className='result-grid'
+                >
+                  <div style={{ background:'var(--bg2)', border:'1px solid var(--border)', borderRadius:20, padding:24 }}>
+                    <FinalResult result={result} />
+                  </div>
+                  <Sidebar result={result} />
+                </motion.div>
+              </AnimatePresence>
+            )}
+          </motion.div>
+        </div>
+      </div>
 
       <style>{`
-        @import url('https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@800,700,500,400&display=swap');
-        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;600;700&display=swap');
+        @media (max-width: 900px) {
+          .notes-grid { grid-template-columns: 1fr !important; }
+          .result-grid { grid-template-columns: 1fr !important; }
+        }
       `}</style>
     </div>
   )
 }
-
-export default Notes

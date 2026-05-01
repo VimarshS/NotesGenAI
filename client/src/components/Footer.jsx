@@ -1,196 +1,91 @@
-// import React from 'react'
-// import { motion } from "motion/react"
-// import logo from "../assets/logo.png"
-// import { useNavigate } from 'react-router-dom'
-// import { useDispatch } from 'react-redux'
-// import axios from 'axios'
-// import { serverUrl } from '../App'
-// import { setUserData } from '../redux/userSlice'
-// function Footer() {
-//     const navigate = useNavigate()
-//      const dispatch = useDispatch()
-//         const handleSignOut = async () => {
-//             try {
-//                 await axios.get(serverUrl+ "/api/auth/logout" , {withCredentials:true})
-//                 dispatch(setUserData(null))
-//                 navigate("/auth")
-                
-                
-//             } catch (error) {
-//                 console.log(error)
-//             }
-//         }
-//   return (
-//     <motion.div 
-//     initial={{ opacity: 0, y: 20 }}
-//       whileInView={{ opacity: 1, y: 0 }}
-//       viewport={{ once: true }}
-//       transition={{ duration: 0.6 }}
-//     className='z-10 mx-6 mb-6 mt-24
-//   rounded-2xl
-//   bg-gradient-to-br from-black/90 via-black/80 to-black/90
-//   backdrop-blur-2xl
-//   border border-white/10
-//   px-8 py-8
-//   shadow-[0_25px_60px_rgba(0,0,0,0.7)]'>
-//     <div className='grid grid-cols-1 md:grid-cols-3 gap-8 items-start'>
-//         <motion.div 
-//         whileHover={{ rotateX: 6, rotateY: -6 }}
-//           className="flex flex-col gap-4 transform-gpu"
-//           style={{ transformStyle: "preserve-3d" }}>
-//             <div className="flex items-center gap-3 cursor-pointer"
-//             style={{ transform: "translateZ(20px)" }}>
-//                 <img src={logo} alt="logo" className='h-9 w-9 object-contain' />
-//                 <span className="
-//                 text-lg font-semibold
-//                 bg-gradient-to-br from-white via-gray-300 to-white
-//                 bg-clip-text text-transparent
-//               "
-//               style={{ textShadow: "0 6px 18px rgba(0,0,0,0.4)" }}>
-//                  ExamNotes <span className="text-gray-400">AI</span>
-//               </span>
-
-//             </div>
-//             <p className="text-sm text-gray-300 max-w-sm">ExamNotes AI helps students generate exam-focused notes,
-//             revision material, diagrams, and printable PDFs using AI.</p>
-
-//         </motion.div>
-
-//         <div className='text-center'>
-//             <h1 className='text-sm font-semibold text-white mb-4'>Quick Links</h1>
-//             <ul className='space-y-2 text-sm'>
-//                 <li onClick={()=>navigate("/notes")} className='text-gray-300 hover:text-white transition-colors'>
-//                     Notes
-//                 </li>
-//                 <li onClick={()=>navigate("/history")} className='text-gray-300 hover:text-white transition-colors'>History</li>
-//                 <li onClick={()=>navigate("/pricing")} className='text-gray-300 hover:text-white transition-colors'>Add Credits</li>
-//             </ul>
-//         </div>
-//  <div className='text-center'>
-//             <h1 className='text-sm font-semibold text-white mb-4'>Support & Account</h1>
-//             <ul className='space-y-2 text-sm'>
-//                 <li onClick={handleSignOut} className='text-red-400 hover:text-red-300 transition-colors'>SignOut</li>
-//                 <li className='text-gray-300 hover:text-white transition-colors'>support@examnotes.com</li>
-//             </ul>
-//         </div>
-
-//     </div>
-//      <div className="my-6 h-px bg-white/10" />
-//      <p className='text-center text-xs text-gray-500'>
-//         © {new Date().getFullYear()} ExamNotes AI. All rights reserved.
-//      </p>
-   
-
-      
-//     </motion.div>
-//   )
-// }
-
-// export default Footer
 import React from 'react'
-import { motion } from "motion/react"
-import logo from "../assets/logo.png"
 import { useNavigate } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 import axios from 'axios'
 import { serverUrl } from '../App'
 import { setUserData } from '../redux/userSlice'
 
-function Footer() {
-    const navigate = useNavigate()
-    const dispatch = useDispatch()
-    const handleSignOut = async () => {
-        try {
-            await axios.get(serverUrl + "/api/auth/logout", { withCredentials: true })
-            dispatch(setUserData(null))
-            navigate("/auth")
-        } catch (error) {
-            console.log(error)
-        }
-    }
+export default function Footer() {
+  const navigate = useNavigate()
+  const dispatch = useDispatch()
 
-    return (
-        <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className='relative z-10 mx-6 mb-6 mt-24
-                rounded-2xl
-                bg-gradient-to-br from-black/90 via-black/80 to-black/90
-                backdrop-blur-2xl
-                border border-white/10
-                px-8 py-8
-                shadow-[0_25px_60px_rgba(0,0,0,0.7)]
-                overflow-hidden'
-        >
-            {/* Grid texture */}
-            <div className="absolute inset-0 pointer-events-none z-0 opacity-[0.04]"
-                style={{
-                    backgroundImage: `linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px)`,
-                    backgroundSize: "72px 72px"
-                }}
-            />
+  const handleSignOut = async () => {
+    try {
+      await axios.get(serverUrl + '/api/auth/logout', { withCredentials:true })
+      dispatch(setUserData(null))
+      navigate('/auth')
+    } catch(e) { console.log(e) }
+  }
 
-            {/* All existing content wrapped in relative z-10 */}
-            <div className="relative z-10">
-                <div className='grid grid-cols-1 md:grid-cols-3 gap-8 items-start'>
-                    <motion.div
-                        whileHover={{ rotateX: 6, rotateY: -6 }}
-                        className="flex flex-col gap-4 transform-gpu"
-                        style={{ transformStyle: "preserve-3d" }}>
-                        <div className="flex items-center gap-3 cursor-pointer"
-                            style={{ transform: "translateZ(20px)" }}>
-                            <img src={logo} alt="logo" className='h-9 w-9 object-contain' />
-                            <span className="text-lg font-semibold
-                                bg-gradient-to-br from-white via-gray-300 to-white
-                                bg-clip-text text-transparent"
-                                style={{ textShadow: "0 6px 18px rgba(0,0,0,0.4)" }}>
-                                ExamNotes <span className="text-gray-400">AI</span>
-                            </span>
-                        </div>
-                        <p className="text-sm text-gray-300 max-w-sm">
-                            ExamNotes AI helps students generate exam-focused notes,
-                            revision material, diagrams, and printable PDFs using AI.
-                        </p>
-                    </motion.div>
+  return (
+    <footer style={{
+      position:'relative', zIndex:1,
+      maxWidth:1100, margin:'0 auto', padding:'0 24px 32px',
+      fontFamily:'var(--font)',
+    }}>
+      <div style={{ background:'var(--bg2)', border:'1px solid var(--border)', borderRadius:20, padding:'36px 40px' }}>
+        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:32 }} className='footer-grid'>
 
-                    <div className='text-center'>
-                        <h1 className='text-sm font-semibold text-white mb-4'>Quick Links</h1>
-                        <ul className='space-y-2 text-sm'>
-                            <li onClick={() => navigate("/notes")} className='text-gray-300 hover:text-white transition-colors cursor-pointer'>
-                                Notes
-                            </li>
-                            <li onClick={() => navigate("/history")} className='text-gray-300 hover:text-white transition-colors cursor-pointer'>
-                                History
-                            </li>
-                            <li onClick={() => navigate("/pricing")} className='text-gray-300 hover:text-white transition-colors cursor-pointer'>
-                                Add Credits
-                            </li>
-                        </ul>
-                    </div>
-
-                    <div className='text-center'>
-                        <h1 className='text-sm font-semibold text-white mb-4'>Support & Account</h1>
-                        <ul className='space-y-2 text-sm'>
-                            <li onClick={handleSignOut} className='text-red-400 hover:text-red-300 transition-colors cursor-pointer'>
-                                SignOut
-                            </li>
-                            <li className='text-gray-300 hover:text-white transition-colors'>
-                                support@examnotes.com
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div className="my-6 h-px bg-white/10" />
-
-                <p className='text-center text-xs text-gray-500'>
-                    © {new Date().getFullYear()} ExamNotes AI. All rights reserved.
-                </p>
+          {/* Brand */}
+          <div>
+            <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:12 }}>
+              <div style={{ width:8, height:8, borderRadius:'50%', background:'var(--accent)', boxShadow:'0 0 10px var(--accent)' }} />
+              <span style={{ fontSize:14, fontWeight:700, color:'var(--text)', letterSpacing:'-0.03em' }}>
+                NotesGen<span style={{ color:'var(--accent)' }}>.</span>AI
+              </span>
             </div>
-        </motion.div>
-    )
-}
+            <p style={{ fontSize:12, color:'var(--text-3)', lineHeight:1.6, maxWidth:220, margin:0 }}>
+              AI-powered exam notes, diagrams, and revision PDFs for students.
+            </p>
+          </div>
 
-export default Footer
+          {/* Links */}
+          <div>
+            <p className='t-label' style={{ marginBottom:14 }}>Navigate</p>
+            <div style={{ display:'flex', flexDirection:'column', gap:9 }}>
+              {[['Home', '/'], ['Generate Notes', '/notes'], ['History', '/history'], ['Buy Credits', '/pricing']].map(([label, path]) => (
+                <button key={label} onClick={() => navigate(path)}
+                  style={{ background:'none', border:'none', cursor:'pointer', textAlign:'left', fontSize:13, color:'var(--text-3)', fontFamily:'var(--font)', padding:0, transition:'color 0.15s' }}
+                  onMouseEnter={e => e.currentTarget.style.color='var(--text)'}
+                  onMouseLeave={e => e.currentTarget.style.color='var(--text-3)'}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Account */}
+          <div>
+            <p className='t-label' style={{ marginBottom:14 }}>Account</p>
+            <div style={{ display:'flex', flexDirection:'column', gap:9 }}>
+              <button onClick={handleSignOut}
+                style={{ background:'none', border:'none', cursor:'pointer', textAlign:'left', fontSize:13, color:'var(--rose)', fontFamily:'var(--font)', padding:0 }}>
+                Sign Out
+              </button>
+              <span style={{ fontSize:13, color:'var(--text-3)' }}>support@notesgen.ai</span>
+            </div>
+          </div>
+        </div>
+
+        <div className='divider' style={{ margin:'28px 0 20px' }} />
+
+        <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', flexWrap:'wrap', gap:10 }}>
+          <p style={{ fontSize:11, color:'var(--text-4)', margin:0 }}>
+            © {new Date().getFullYear()} NotesGen AI. All rights reserved.
+          </p>
+          <span className='badge badge-green' style={{ fontSize:10 }}>
+            <span style={{ width:5, height:5, borderRadius:'50%', background:'var(--green)', display:'inline-block' }} />
+            All systems operational
+          </span>
+        </div>
+      </div>
+
+      <style>{`
+        @media (max-width: 640px) {
+          .footer-grid { grid-template-columns: 1fr !important; gap: 24px !important; }
+        }
+      `}</style>
+    </footer>
+  )
+}

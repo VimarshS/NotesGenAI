@@ -1,247 +1,194 @@
 import React, { useEffect, useState } from 'react'
-import { motion } from "motion/react"
-import { generateNotes } from '../services/api';
-import { useDispatch } from 'react-redux';
-import { updateCredits } from '../redux/userSlice';
-function TopicForm({ setResult, setLoading, loading, setError }) {
-  const [topic, setTopic] = useState("");
-  const [classLevel, setClassLevel] = useState("");
-  const [examType, setExamType] = useState("");
-  const [revisionMode, setRevisionMode] = useState(false);
-  const [includeDiagram, setIncludeDiagram] = useState(false);
-  const [includeChart, setIncludeChart] = useState(false);
-  const [progress, setProgress] = useState(0);
-  const [progressText, setProgressText] = useState("");
+import { motion, AnimatePresence } from 'motion/react'
+import { generateNotes } from '../services/api'
+import { useDispatch } from 'react-redux'
+import { updateCredits } from '../redux/userSlice'
+
+export default function TopicForm({ setResult, setLoading, loading, setError }) {
+  const [topic, setTopic] = useState('')
+  const [classLevel, setClassLevel] = useState('')
+  const [examType, setExamType] = useState('')
+  const [revisionMode, setRevisionMode] = useState(false)
+  const [includeDiagram, setIncludeDiagram] = useState(false)
+  const [includeChart, setIncludeChart] = useState(false)
+  const [progress, setProgress] = useState(0)
+  const [progressText, setProgressText] = useState('')
   const dispatch = useDispatch()
 
   const handleSubmit = async () => {
-    if (!topic.trim()) {
-      setError("Please enter the topic")
-      return;
-    }
-    setError("")
+    if (!topic.trim()) { setError('Please enter a topic'); return }
+    setError('')
     setLoading(true)
     setResult(null)
     try {
-
-      const result = await generateNotes({topic,
-        classLevel,
-        examType,
-        revisionMode,
-        includeDiagram,
-        includeChart})
-        setResult(result.data)
-        setLoading(false)
-        setClassLevel("")
-        setTopic("")
-        setExamType("")
-        setIncludeChart(false)
-        setRevisionMode(false)
-        setIncludeDiagram(false)
-
-        if(typeof result.creditsLeft === "number"){
-          dispatch(updateCredits(result.creditsLeft));
-
-        }
-
-
-    } catch (error) {
-   console.log(error)
-   setError("Failed to fetch notes from server");
+      const result = await generateNotes({ topic, classLevel, examType, revisionMode, includeDiagram, includeChart })
+      setResult(result.data)
+      setLoading(false)
+      setTopic(''); setClassLevel(''); setExamType('')
+      setRevisionMode(false); setIncludeDiagram(false); setIncludeChart(false)
+      if (typeof result.creditsLeft === 'number') dispatch(updateCredits(result.creditsLeft))
+    } catch (err) {
+      console.log(err)
+      setError('Failed to generate notes. Please try again.')
       setLoading(false)
     }
   }
 
-  useEffect(()=>{
-  if(!loading){
-    setProgress(0);
-    setProgressText("")
-    return;
-  }
-  let value = 0;
-
-  const interval = setInterval(()=>{
-    value += Math.random() * 8
-
-     if (value >= 95) {
-      value = 95;
-      setProgressText("Almost done…");
-      clearInterval(interval);
-    } else if (value > 70) {
-      setProgressText("Finalizing notes…");
-    } else if (value > 40) {
-      setProgressText("Processing content…");
-    } else {
-      setProgressText("Generating notes…");
-    }
-
-    setProgress(Math.floor(value))
-
-  },700)
-
-  return () => clearInterval(interval);
-
-
-  },[loading])
-
-
-
-
+  useEffect(() => {
+    if (!loading) { setProgress(0); setProgressText(''); return }
+    let v = 0
+    const steps = ['Analysing topic…', 'Structuring content…', 'Writing notes…', 'Adding key points…', 'Almost done…']
+    const iv = setInterval(() => {
+      v += Math.random() * 7
+      if (v >= 95) { v = 95; clearInterval(iv) }
+      setProgressText(steps[Math.min(Math.floor(v / 20), steps.length - 1)])
+      setProgress(Math.floor(v))
+    }, 650)
+    return () => clearInterval(iv)
+  }, [loading])
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="
-        rounded-2xl
-        bg-gradient-to-br  from-black/90 via-black/80 to-black/90
-        backdrop-blur-2xl
-        border border-white/10
-        shadow-[0_25px_60px_rgba(0,0,0,0.75)]
-        p-8
-        space-y-6
-        text-white
-      ">
-
-      <input type="text" className=' w-full p-3 rounded-xl
-        bg-white/10 backdrop-blur-lg
-        border border-white/20
-        placeholder-gray-400
-        text-white
-        focus:outline-none focus:ring-2 focus:ring-white/30' placeholder='Enter topic (e.g. Web Development)'
-        onChange={(e) => setTopic(e.target.value)}
-        value={topic}
-      />
-      <input type="text" className=' w-full p-3 rounded-xl
-        bg-white/10 backdrop-blur-lg
-        border border-white/20
-        placeholder-gray-400
-        text-white
-        focus:outline-none focus:ring-2 focus:ring-white/30'
-        placeholder='Class / Level (e.g. Class 10)'
-        onChange={(e) => setClassLevel(e.target.value)}
-        value={classLevel}
-      />
-      <input type="text" className=' w-full p-3 rounded-xl
-        bg-white/10 backdrop-blur-lg
-        border border-white/20
-        placeholder-gray-400
-        text-white
-        focus:outline-none focus:ring-2 focus:ring-white/30'
-        placeholder='Exam Type (e.g. CBSE, JEE, NEET)'
-        onChange={(e) => setExamType(e.target.value)}
-        value={examType}
-      />
-
-      <div className='flex flex-col md:flex-row gap-6'>
-        <Toggle label="Exam Revision Mode" checked={revisionMode} onChange={() => setRevisionMode(!revisionMode)} />
-        <Toggle
-          label="Include Diagram"
-          checked={includeDiagram}
-          onChange={() => setIncludeDiagram(!includeDiagram)}
-        />
-        <Toggle
-          label="Include Charts"
-          checked={includeChart}
-          onChange={() => setIncludeChart(!includeChart)}
-        />
+    <div style={{
+      background:'var(--bg2)', border:'1px solid var(--border)',
+      borderRadius:20, overflow:'hidden', fontFamily:'var(--font)',
+    }}>
+      {/* Header strip */}
+      <div style={{
+        padding:'16px 20px', borderBottom:'1px solid var(--border)',
+        display:'flex', alignItems:'center', gap:12,
+        background:'var(--bg3)',
+      }}>
+        <div style={{ width:32, height:32, borderRadius:9, background:'var(--accent-dim)', border:'1px solid rgba(99,102,241,0.25)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:14, color:'var(--accent)' }}>
+          ✦
+        </div>
+        <div>
+          <div style={{ fontSize:13, fontWeight:700, color:'var(--text)' }}>Generate Notes</div>
+          <div style={{ fontSize:11, color:'var(--text-3)', marginTop:1 }}>Fill in the details to create AI-powered notes</div>
+        </div>
+        <div style={{ marginLeft:'auto' }}>
+          <span className='badge badge-accent' style={{ fontSize:10 }}>
+            <span style={{ fontSize:8 }}>◆</span> AI Ready
+          </span>
+        </div>
       </div>
 
-      <motion.button
-      onClick={handleSubmit}
-        whileHover={!loading ? { scale: 1.02 } : {}}
-        whileTap={!loading ? { scale: 0.95 } : {}}
-        disabled={loading}
-        className={`
-    w-full mt-4
-    py-3 rounded-xl
-    font-semibold
-    flex items-center justify-center gap-3
-    transition
-    ${loading
-            ? "bg-gray-300 text-gray-600 cursor-not-allowed"
-            : "bg-gradient-to-br from-white to-gray-200 text-black shadow-[0_15px_35px_rgba(0,0,0,0.4)]"
-          }
-  `}>
-        {loading ? "Generating Notes..." : "Generate Notes"}
+      {/* Form body */}
+      <div style={{ padding:20, display:'flex', flexDirection:'column', gap:14 }}>
 
-      </motion.button>
+        {/* Topic input — large */}
+        <div>
+          <label style={{ display:'block', fontSize:11, fontWeight:600, color:'var(--text-3)', marginBottom:6, letterSpacing:'0.05em', textTransform:'uppercase' }}>
+            Topic *
+          </label>
+          <input
+            className='input'
+            value={topic}
+            onChange={e => setTopic(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && !loading && handleSubmit()}
+            placeholder='e.g. Photosynthesis, World War II, Calculus…'
+            style={{ fontSize:15, padding:'13px 16px', borderRadius:12 }}
+          />
+        </div>
 
+        {/* Row: Class + Exam */}
+        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }} className='form-row'>
+          <div>
+            <label style={{ display:'block', fontSize:11, fontWeight:600, color:'var(--text-3)', marginBottom:6, letterSpacing:'0.05em', textTransform:'uppercase' }}>
+              Class / Level
+            </label>
+            <input className='input' value={classLevel} onChange={e => setClassLevel(e.target.value)}
+              placeholder='e.g. Class 10, Grade 12' />
+          </div>
+          <div>
+            <label style={{ display:'block', fontSize:11, fontWeight:600, color:'var(--text-3)', marginBottom:6, letterSpacing:'0.05em', textTransform:'uppercase' }}>
+              Exam Type
+            </label>
+            <input className='input' value={examType} onChange={e => setExamType(e.target.value)}
+              placeholder='e.g. CBSE, JEE, NEET' />
+          </div>
+        </div>
 
-     { loading && 
-     <div className='mt-4 space-y-2'>
+        {/* Toggles */}
+        <div style={{ background:'var(--bg3)', border:'1px solid var(--border)', borderRadius:12, padding:'14px 16px' }}>
+          <p style={{ fontSize:11, fontWeight:600, color:'var(--text-3)', marginBottom:12, letterSpacing:'0.05em', textTransform:'uppercase', margin:'0 0 12px' }}>Options</p>
+          <div style={{ display:'flex', flexWrap:'wrap', gap:20 }}>
+            <Toggle label='Exam Revision Mode' checked={revisionMode} onChange={() => setRevisionMode(v => !v)} icon='⚡' />
+            <Toggle label='Include Diagram' checked={includeDiagram} onChange={() => setIncludeDiagram(v => !v)} icon='◎' />
+            <Toggle label='Include Charts' checked={includeChart} onChange={() => setIncludeChart(v => !v)} icon='▦' />
+          </div>
+        </div>
 
-      <div className='w-full h-2 rounded-full bg-white/10 overflow-hidden'>
-      <motion.div 
-      initial={{width:0}}
-      animate={{width : `${progress}%`}}
-      transition={{ ease: "easeOut", duration: 0.6 }}
-      className='h-full bg-gradient-to-r from-green-400 via-emerald-400 to-green-500'>
-
-      </motion.div>
-      
-      </div>
-
-      <div className='flex justify-between text-xs text-gray-300'>
-        <span>{progressText}</span>
-        <span>{progress}%</span>
-      </div>
-      <p className='text-xs text-gray-400 text-center'>
-         This may take up to 2–5 minutes. Please don’t close or refresh the page.
-      </p>
-
-
-      </div>}
-
-
-
-
-
-    </motion.div>
-  )
-}
-
-
-function Toggle({ label, checked, onChange }) {
-  return (
-    <div className='flex items-center gap-4 cursor-pointer select-none' onClick={onChange}>
-      <motion.div
-        animate={{
-          backgroundColor: checked
-            ? "rgba(34,197,94,0.35)"   // green when ON
-            : "rgba(255,255,255,0.15)" // gray when OFF
-        }}
-        transition={{ duration: 0.25 }}
-        className='relative w-12 h-6 rounded-full
-          border border-white/20
-          backdrop-blur-lg'
-
-      >
-        <motion.div
-          layout
-          transition={{ type: "spring", stiffness: 500, damping: 30 }}
-          className=' absolute top-0.5
-            h-5 w-5 rounded-full
-            bg-white
-            shadow-[0_5px_15px_rgba(0,0,0,0.5)]'
+        {/* Submit */}
+        <motion.button
+          onClick={handleSubmit}
+          disabled={loading}
+          whileHover={!loading ? { scale:1.015 } : {}}
+          whileTap={!loading ? { scale:0.985 } : {}}
           style={{
-            left: checked ? "1.6rem" : "0.25rem",
+            width:'100%', padding:'14px 20px',
+            borderRadius:12, border:'none', cursor: loading ? 'not-allowed' : 'pointer',
+            fontFamily:'var(--font)', fontSize:14, fontWeight:700,
+            display:'flex', alignItems:'center', justifyContent:'center', gap:8,
+            transition:'all 0.2s',
+            background: loading ? 'var(--bg5)' : 'var(--accent)',
+            color: loading ? 'var(--text-3)' : 'white',
+            boxShadow: loading ? 'none' : '0 4px 24px var(--accent-glow)',
           }}
-
         >
+          {loading ? (
+            <>
+              <span className='animate-spin-slow' style={{ display:'inline-block', width:15, height:15, border:'2px solid rgba(255,255,255,0.2)', borderTopColor:'rgba(255,255,255,0.7)', borderRadius:'50%' }} />
+              Generating…
+            </>
+          ) : (
+            <>✦ Generate Notes</>
+          )}
+        </motion.button>
 
+        {/* Progress */}
+        <AnimatePresence>
+          {loading && (
+            <motion.div
+              initial={{ opacity:0, height:0 }} animate={{ opacity:1, height:'auto' }} exit={{ opacity:0, height:0 }}
+              style={{ overflow:'hidden' }}
+            >
+              <div style={{ display:'flex', justifyContent:'space-between', marginBottom:8 }}>
+                <span style={{ fontSize:12, color:'var(--text-3)', fontFamily:'var(--font)' }}>{progressText}</span>
+                <span style={{ fontSize:12, color:'var(--accent-2)', fontFamily:'var(--font-mono)', fontWeight:600 }}>{progress}%</span>
+              </div>
+              <div className='progress-track'>
+                <div className='progress-fill' style={{ width:`${progress}%` }} />
+              </div>
+              <p style={{ marginTop:10, fontSize:11, color:'var(--text-4)', textAlign:'center', fontFamily:'var(--font)' }}>
+                This may take 2–5 minutes · Please don't close this tab
+              </p>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
 
-        </motion.div>
-      </motion.div>
-
-      <span className={`text-sm transition-colors ${checked ? "text-green-300" : "text-gray-300"
-        }`}>{label}</span>
-
+      <style>{`
+        @media (max-width: 560px) { .form-row { grid-template-columns: 1fr !important; } }
+      `}</style>
     </div>
   )
 }
 
-
-
-
-export default TopicForm
+function Toggle({ label, checked, onChange, icon }) {
+  return (
+    <div onClick={onChange} style={{ display:'flex', alignItems:'center', gap:10, cursor:'pointer', userSelect:'none' }}>
+      <div
+        className='toggle-track'
+        style={{ background: checked ? 'var(--accent)' : 'var(--bg5)', border:`1px solid ${checked ? 'rgba(99,102,241,0.5)' : 'var(--border)'}` }}
+      >
+        <div className='toggle-thumb' style={{ left: checked ? 17 : 3 }} />
+      </div>
+      <div style={{ display:'flex', alignItems:'center', gap:5 }}>
+        <span style={{ fontSize:11, color: checked ? 'var(--accent-2)' : 'var(--text-3)' }}>{icon}</span>
+        <span style={{ fontSize:12, fontWeight:600, color: checked ? 'var(--text)' : 'var(--text-3)', fontFamily:'var(--font)', transition:'color 0.2s' }}>
+          {label}
+        </span>
+      </div>
+    </div>
+  )
+}
