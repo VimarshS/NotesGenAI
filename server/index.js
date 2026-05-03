@@ -12,6 +12,7 @@ import { stripeWebhook } from "./controllers/credits.controller.js"
 dotenv.config()
 
 const app = express()
+app.set('trust proxy', 1)
 
 // ── Stripe webhook MUST be raw body, registered BEFORE cors/json middleware ──
 app.post(
