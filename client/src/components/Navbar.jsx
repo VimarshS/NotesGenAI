@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'motion/react'
-import logo from '../assets/logo.png'
 import lg from '../assets/lg.png'
 import { useDispatch, useSelector } from 'react-redux'
 import axios from 'axios'
