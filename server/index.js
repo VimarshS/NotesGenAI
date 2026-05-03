@@ -34,7 +34,7 @@ app.use(cookieParser())
 const PORT = process.env.PORT || 5000
 
 app.get("/", (req, res) => {
-  res.json({ message: "ExamNotes AI Backend Running 🚀" })
+  res.json({ message: "NotesGen AI Backend Running 🚀" })
 })
 
 app.use("/api/auth", authRouter)
