@@ -24,7 +24,9 @@ export default function Auth() {
       const { displayName: name, email } = response.user
       const result = await axios.post(serverUrl + '/api/auth/google', { name, email }, { withCredentials: true })
       dispatch(setUserData(result.data))
-    } catch (error) { console.log(error) }
+    } catch (error) { 
+  console.log("AUTH ERROR:", error.code, error.message) 
+}
   }
 
   return (
