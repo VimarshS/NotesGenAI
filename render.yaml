@@ -5,7 +5,7 @@ services:
     region: oregon
     plan: free
     buildCommand: npm install
-    startCommand: node server/index.js
+    startCommand: node index.js
     envVars:
       - key: PORT
         value: 3000
@@ -33,9 +33,10 @@ services:
     env: node
     region: oregon
     plan: free
-    buildCommand: npm install && npm run build
-    startCommand: npm run preview
-    staticPublishPath: client/dist
+    buildCommand: cd client && npm install && npm run build
+    startCommand: cd client && node server.js
     envVars:
       - key: VITE_API_URL
         value: https://notesgenai-backend.onrender.com
+      - key: PORT
+        value: 3000

@@ -3,12 +3,9 @@ services:
     name: notesgenai-frontend
     env: node
     buildCommand: npm install && npm run build
-    startCommand: npm run preview
-    staticPublishPath: dist
+    startCommand: node server.js
     envVars:
       - key: VITE_API_URL
-        fromService:
-          type: web
-          name: notesgenai-backend
-          envVarKey: RENDER_EXTERNAL_URL
-        scope: build
+        sync: false
+      - key: PORT
+        value: 3000
