@@ -32,7 +32,7 @@ app.use(cors({
 app.use(express.json())
 app.use(cookieParser())
 
-const PORT = process.env.PORT || 5000
+const PORT = process.env.PORT || 3000
 
 app.get("/", (req, res) => {
   res.json({ message: "NotesGen AI Backend Running 🚀" })
